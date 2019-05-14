@@ -3,7 +3,7 @@
 const APIrequest = require('request');
 const http = require('http');
 
-const APIkey = none;  // ADD API KEY HERE
+const APIkey = e6aa1f5e9579ee6f11f8f9d0ab1878733917e5e5;  // ADD API KEY HERE
 const url = "https://translation.googleapis.com/language/translate/v2?key="+APIkey
 
 // An object containing the data expressing the query to the
