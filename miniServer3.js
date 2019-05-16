@@ -15,6 +15,8 @@ function queryHandler(req, res, next) {
     let qObj = req.query;
     console.log(qObj);
     if (qObj.word != undefined) {
+      //var text = qObj.word.split('').reverse().join('');
+      //res.json( {"word" : qObj.word} );
 
 // An object containing the data expressing the query to the
 // translate API. 
@@ -45,33 +47,37 @@ APIrequest(
 	// callback function for API request
 	APIcallback
     );
-
+      // callback function, called when data is received from API
+      function APIcallback(err, APIresHead, APIresBody) {
+        // gets three objects as input
+        if ((err) || (APIresHead.statusCode != 200)) {
+          // API is not working
+          console.log("Got API error");
+          console.log(APIresBody);
+        } else {
+          if (APIresHead.error) {
+            // API worked but is not giving you data
+            console.log(APIresHead.error);
+          } else {
+            console.log("In Spanish: ",
+                     APIresBody.data.translations[0].translatedText);
+            console.log("\n\nJSON was:");
+            console.log(JSON.stringify(APIresBody, undefined, 2));
+            var text = JSON.stringify(APIresBody, undefined, 2);
+            
+            /*trying to get output to the browser*/
+            res.json( {"translation" : text} );
+            // print it out as a string, nicely formatted
+          }
+        }
+      } // end callback function
     }
     else {
 	next();
     }
 }
 
-    // callback function, called when data is received from API
-    function APIcallback(err, APIresHead, APIresBody) {
-	// gets three objects as input
-	if ((err) || (APIresHead.statusCode != 200)) {
-	    // API is not working
-	    console.log("Got API error");
-	    console.log(APIresBody);
-	} else {
-	    if (APIresHead.error) {
-		// API worked but is not giving you data
-		console.log(APIresHead.error);
-	    } else {
-		console.log("In Spanish: ", 
-		    APIresBody.data.translations[0].translatedText);
-		console.log("\n\nJSON was:");
-		console.log(JSON.stringify(APIresBody, undefined, 2));
-		// print it out as a string, nicely formatted
-	    }
-	}
-    } // end callback function
+
 
 
 
