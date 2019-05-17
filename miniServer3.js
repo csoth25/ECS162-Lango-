@@ -61,12 +61,15 @@ APIrequest(
           } else {
             console.log("In Spanish: ",
                      APIresBody.data.translations[0].translatedText);
-            console.log("\n\nJSON was:");
-            console.log(JSON.stringify(APIresBody, undefined, 2));
-            var text = JSON.stringify(APIresBody, undefined, 2);
+            
+            var text = APIresBody.data.translations[0].translatedText;
             
             /*trying to get output to the browser*/
-            res.json( {"translation" : text} );
+            res.json( {"word" : text} );
+            
+            console.log("\n\nJSON was:");
+            console.log(JSON.stringify(APIresBody, undefined, 2));
+
             // print it out as a string, nicely formatted
           }
         }

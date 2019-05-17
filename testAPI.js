@@ -33,7 +33,6 @@ APIrequest(
 	// callback function for API request
 	APIcallback
     );
-console.log(url);
 
     // callback function, called when data is received from API
     function APIcallback(err, APIresHead, APIresBody) {
