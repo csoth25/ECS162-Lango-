@@ -13,10 +13,11 @@ function createDBRequest(method, url) {
 
 // Make the actual server request.
 
+//THIS IS NOT DONE!!!
 function makeDbRequest {
     //need to retrieve source and target to create url
     let searchInput = document.getElementById("save");
-    let source = searchInput.value; // need to figure out how to retrieve each value
+    let source = searchInput.value; // still need to figure out how to retrieve each value
     let target = searchInput.value;
     let url = "store?english=" + source + "&spanish=" + target;
     let xhr = createDBRequest('GET', url);
@@ -28,6 +29,7 @@ function makeDbRequest {
     
     // Load some functions into response handlers.
     xhr.onload = function() {
+        //not sure what we're doing here yet
         let responseStr = xhr.responseText;  // get the JSON string
         let object = JSON.parse(responseStr);  // turn it into an object
     }
