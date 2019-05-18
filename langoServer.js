@@ -113,26 +113,29 @@ function insertCallback(err) {
     if ("insertion error: ",err) {
         console.log(err);
     } else {
-        console.log("saved!");
+        console.log("flashcard saved!");
         
         /*for debugging
         get output from database
         return all rows in data base with user 1*/
         db.all(('SELECT * FROM Flashcards WHERE user = 1'), arrayCallback);
-        
-        //arrayData contains an array of objects, each object contains one row
-        function arrayCallback(err, arrayData){
-            if(err) {
-                console.log("error: ", err, "\n");
-            } else {
-                console.log("array: ", arrayData, "\n");
-            }
-        }
+    }
+}
+
+
+//arrayData contains an array of objects, each object contains one row
+function arrayCallback(err, arrayData){
+    if(err) {
+        console.log("error: ", err, "\n");
+    } else {
+        console.log("array: ", arrayData, "\n");
+        //use below to delete all data from DB when needed
+        //db.all('DELETE FROM Flashcards');
     }
 }
 
 /*
- //update a row, do NOT omit WHERE, risk changing all columns in all rows
+ //to update a row, do NOT omit WHERE, risk changing all columns in all rows
  db.run('UPDATE Flashcards SET seen = 1 WHERE rowid = 1'), errorCallback);
  */
 
