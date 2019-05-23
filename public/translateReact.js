@@ -15,16 +15,18 @@ function FirstCard() {
 	"div",
 	{ id: "inputDiv" },
 	React.createElement(
-	    "input", {id: "word", onKeyPress: makeServerRequest}
+	    "input", {id: "word", onKeyPress: checkReturn}
 	)
     );
 }
 
-/*function checkReturn() {
+function checkReturn(event) {
+    console.log(event.charCode)
     if (event.charCode == 13) {
-	return makeServerRequest;
+        console.log("inside if");
+        makeServerRequest();
     }
-}*/
+}
 
 function Output() {
 	return React.createElement(

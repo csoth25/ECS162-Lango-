@@ -1,5 +1,5 @@
-const sqlite3 = require("sqlite3").verbose();  // use sqlite
-const fs = require("fs"); // file system
+//const sqlite3 = require("sqlite3").verbose();  // use sqlite
+//const fs = require("fs"); // file system
 
 console.log('FlashcardsDB.js code running');
 
@@ -13,7 +13,7 @@ function createDBRequest(method, url) {
 // Make the actual server request.
 
 //THIS IS NOT DONE!!!
-function makeDbRequest() {
+export function makeDbRequest() {
     //need to retrieve source and target to create url
     let source = document.getElementById("word");
     let searchOutput = document.getElementById("outputGoesHere");

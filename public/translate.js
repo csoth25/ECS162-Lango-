@@ -9,7 +9,7 @@ function createServerRequest(method, url) {
 
 // Make the actual server request.
 
-function makeServerRequest() {
+export function makeServerRequest() {
   let searchInput = document.getElementById("word");
   let input = searchInput.value;
   let url = "query?word=" + input;
