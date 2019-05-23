@@ -10,6 +10,17 @@ var lango = React.createElement(
 	"Lango!"
 );
 
+//need to add onClick:startReviewRequest(), next phase?
+function startReview() {
+    return React.createElement(
+                               "div",
+                               { className: "review_div" },
+                               React.createElement(
+                                                   "input", {type: "review", value: "Start Review", id: "review"},
+                                                   )
+                               )
+}
+
 function Overall() {
     return React.createElement(
 	"div",
@@ -28,9 +39,7 @@ function FirstCard() {
 }
 
 function checkReturn(event) {
-    console.log(event.charCode)
     if (event.charCode == 13) {
-        console.log("inside if");
         makeServerRequest();
     }
 }
@@ -63,18 +72,6 @@ function FirstInputCard() {
         )
 	)
 }
-
-//need to add onClick:startReviewRequest(), next phase?
-function startReview() {
-    return React.createElement(
-        "div",
-        { className: "review_div" },
-        React.createElement(
-            "input", {type: "review", value: "Start Review", id: "review"},
-        )
-    )
-}
-
 
 
 function footer() {
