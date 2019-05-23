@@ -129,9 +129,9 @@ function arrayCallback(err, arrayData){
         console.log("error: ", err, "\n");
     } else {
         console.log("array: ", arrayData, "\n");
-        dumpDB();
+        //dumpDB();
         //use below to delete all data from DB when needed
-        //db.all('DELETE FROM Flashcards');
+        db.all('DELETE FROM Flashcards WHERE user = 1');
     }
 }
 
@@ -141,12 +141,12 @@ function arrayCallback(err, arrayData){
  */
 
 
-
+/*
 //To test program, print out the whole database
 dumpDB() {
-    db.all ( 'SELECT * FROM flashcards', dataCallback);
+    db.all ( 'SELECT * FROM Flashcards', dataCallback);
     function dataCallback( err, data ) {console.log(data)}
-}
+}*/
 
 
 
