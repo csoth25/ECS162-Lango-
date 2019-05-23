@@ -3,7 +3,7 @@
 //const fs = require("fs"); // file system
 import {makeServerRequest} from './translate.js';
 import {makeDbRequest} from './FlashcardsDB.js';
-
+var check = false;
 var lango = React.createElement(
 	"h1",
 	{ id: "logo" },
@@ -33,13 +33,15 @@ function FirstCard() {
 	"div",
 	{ id: "inputDiv" },
 	React.createElement(
-	    "input", {id: "word", onKeyPress: checkReturn}
+	   "input", {id: "word", onKeyPress: checkReturn}
 	)
     );
 }
 
 function checkReturn(event) {
     if (event.charCode == 13) {
+        console.log("inside if");
+	check = true;
         makeServerRequest();
     }
 }
@@ -49,28 +51,27 @@ function Output() {
 		"div",
 		{ id: "outputDiv" },
             React.createElement(
-		"output", {id: "outputGoesHere"} )
+		"div", {id: "outputGoesHere"}, React.createElement("p", {id: "text"}))
 	);
 }
 
-/*function test() {
-    return React.createElement(
-        "div",
-        {className: "request_div"},
-        React.createElement(
-            "input",
-            {type: "submit", value: "submit", id: "submit", onClick:makeServerRequest}
-        )
-    )
-}*/
 function FirstInputCard() {
 	return React.createElement(
 		"div",
 		{ id: "save_div" },
         React.createElement(
-            "input", {type: "save", value: "save", id: "save", onClick:makeDbRequest},
+            "input", {type: "save", value: "save", id: "save", onClick:checkSave},
         )
 	)
+}
+
+function checkSave() {
+    if (check == true) {
+	check = false;
+	makeDbRequest();
+    } else {
+	alert('Woops, there was an error making the request.');
+    }
 }
 
 
@@ -83,7 +84,6 @@ function footer() {
 var main = React.createElement(
 	"main",
 	null,
-    React.createElement(startReview, null),
     lango,
     React.createElement(Overall,null),
    // React.createElement(FirstCard, null),
