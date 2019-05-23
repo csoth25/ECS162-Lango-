@@ -12,8 +12,22 @@ body {
 #logo {
     color:#606B9B;
     font-family: 'Raleway', sans-serif;
-    font-size: 70pt;
+    font-size: 6vw;
     text-align: center;
+}
+
+#review {
+    margin-top: .5%;
+    margin-left: 6%;
+    background-color:#606B9B;
+    height: 7.1vh;
+    width: 18vw;
+    border-radius: 12px;
+    font-size: 2vw;
+    color: white;
+    font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
+    text-align: center;
+    float: left;
 }
 
 #word {

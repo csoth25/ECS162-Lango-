@@ -57,6 +57,19 @@ function FirstInputCard() {
 	)
 }
 
+//need to add onClick:startReviewRequest(), next phase?
+function startReview() {
+    return React.createElement(
+        "div",
+        { className: "review_div" },
+        React.createElement(
+            "input", {type: "review", value: "Start Review", id: "review"},
+        )
+    )
+}
+
+
+
 function footer() {
     return React.createElement(
         "footer", {className: "foot"}, React.createElement("p", null, "Username")
@@ -66,6 +79,7 @@ function footer() {
 var main = React.createElement(
 	"main",
 	null,
+    React.createElement(startReview, null),
     lango,
     React.createElement(FirstCard, null),
     React.createElement(Output, null),
