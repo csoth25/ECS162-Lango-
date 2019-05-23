@@ -84,7 +84,7 @@ function footer() {
 var main = React.createElement(
 	"main",
 	null,
-    React.createElement(startReview,null),
+	React.createElement(startReview,null),
     lango,
     React.createElement(Overall,null),
    // React.createElement(FirstCard, null),
