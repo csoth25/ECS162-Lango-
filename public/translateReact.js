@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 //const sqlite3 = require("sqlite3").verbose();  // use sqlite
 //const fs = require("fs"); // file system
 import {makeServerRequest} from './translate.js';
@@ -9,6 +9,13 @@ var lango = React.createElement(
 	{ id: "logo" },
 	"Lango!"
 );
+
+function Overall() {
+    return React.createElement(
+	"div",
+	{id: "overall"}, FirstCard(), Output()
+    )
+}
 
 function FirstCard() {
     return React.createElement(
@@ -32,8 +39,8 @@ function Output() {
 	return React.createElement(
 		"div",
 		{ id: "outputDiv" },
-        React.createElement("p", {id: "outputGoesHere"}, null
-        )
+            React.createElement(
+		"output", {id: "outputGoesHere"} )
 	);
 }
 
@@ -50,7 +57,7 @@ function Output() {
 function FirstInputCard() {
 	return React.createElement(
 		"div",
-		{ className: "save_div" },
+		{ id: "save_div" },
         React.createElement(
             "input", {type: "save", value: "save", id: "save", onClick:makeDbRequest},
         )
@@ -67,9 +74,9 @@ var main = React.createElement(
 	"main",
 	null,
     lango,
-    React.createElement(FirstCard, null),
-    React.createElement(Output, null),
-   // React.createElement(test, null),
+    React.createElement(Overall,null),
+   // React.createElement(FirstCard, null),
+   // React.createElement(Output, null),
     React.createElement(FirstInputCard, null),
     React.createElement(footer, null)
 );
