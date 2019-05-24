@@ -19,10 +19,13 @@ const db = new sqlite3.Database(dbFileName);
 
 function queryHandler(req, res, next) {
     let qObj = req.query;
-    //console.log(qObj);
+    if (searchInput.value == "") {
+        input = "Davis,CA,US";
+    } else {
+        input = searchInput.value;
+    }
     
     if (qObj.word != undefined) {
-      //res.json( {"word" : qObj.word} );
 
     // An object containing the data expressing the query to the translate API.
     // Below, gets stringified and put into the body of an HTTP PUT request.

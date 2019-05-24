@@ -37,15 +37,13 @@ function FirstCard() {
 	"div",
 	{ id: "inputDiv" },
 	React.createElement(
-	   "input", {id: "word", onKeyPress: checkReturn}
-	)
+	   "input", {id: "word", onKeyPress: checkReturn})
     );
 }
 
 function checkReturn(event) {
     if (event.charCode == 13) {
-        console.log("inside if");
-	check = true;
+        check = true;
         makeServerRequest();
     }
 }
@@ -64,7 +62,7 @@ function FirstInputCard() {
 		"div",
 		{ id: "save_div" },
         React.createElement(
-            "input", {type: "save", value: "save", id: "save", onClick:checkSave},
+            "input", {type: "save", value: "Save", id: "save", onClick:checkSave},
         )
 	)
 }
@@ -81,7 +79,7 @@ function checkSave() {
 
 function footer() {
     return React.createElement(
-        "footer", {className: "foot"}, React.createElement("p", null, "Username")
+        "footer", {className: "foot"}, React.createElement("p", null, "UserName")
     )
 }
 
