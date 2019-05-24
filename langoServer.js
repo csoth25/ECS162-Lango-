@@ -19,11 +19,6 @@ const db = new sqlite3.Database(dbFileName);
 
 function queryHandler(req, res, next) {
     let qObj = req.query;
-    if (searchInput.value == "") {
-        input = "Davis,CA,US";
-    } else {
-        input = searchInput.value;
-    }
     
     if (qObj.word != undefined) {
 
