@@ -4,21 +4,25 @@
 import {makeServerRequest} from './translate.js';
 import {makeDbRequest} from './FlashcardsDB.js';
 var check = false;
+
+function Title() {
+    return React.createElement(
+	"div", {id: "title"}, startReview(), lango)
+}
+
 var lango = React.createElement(
-	"h1",
-	{ id: "logo" },
-	"Lango!"
+    "div",
+    { id: "holdLogo" }, React.createElement("h1", {id: "logo"}, "Lango!")
 );
 
-//need to add onClick:startReviewRequest(), next phase?
 function startReview() {
     return React.createElement(
-                               "div",
-                               { className: "review_div" },
-                               React.createElement(
-                                                   "input", {type: "review", value: "Start Review", id: "review"},
-                                                   )
-                               )
+	"div",
+	{id: "review_div" },
+	React.createElement(
+	    "input", {type: "review", value: "Start Review", id: "review"},
+	)
+    )
 }
 
 function Overall() {
@@ -84,11 +88,8 @@ function footer() {
 var main = React.createElement(
 	"main",
 	null,
-	React.createElement(startReview,null),
-    lango,
+	React.createElement(Title,null),
     React.createElement(Overall,null),
-   // React.createElement(FirstCard, null),
-   // React.createElement(Output, null),
     React.createElement(FirstInputCard, null),
     React.createElement(footer, null)
 );
