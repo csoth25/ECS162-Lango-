@@ -76,19 +76,22 @@ body {
   font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
 }
 
-output  {
+#outputGoesHere  {
+    display: flex;
     border-style: solid;
     height:300px;
     width: 400px;
-    text-align: center;
     font-size:30pt;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
     font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
 }
 
 #save_div {
     margin-bottom: 150px;
     margin-top: 40px;
-    margin-right: 200px;
+    margin-right: 210px;
     margin-left: 20px;
 }
 
