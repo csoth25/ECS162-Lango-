@@ -1,8 +1,6 @@
 //const sqlite3 = require("sqlite3").verbose();  // use sqlite
 //const fs = require("fs"); // file system
 
-console.log('FlashcardsDB.js code running');
-
 // Create the XHR object.
 function createDBRequest(method, url) {
     let xhr = new XMLHttpRequest();
@@ -12,14 +10,16 @@ function createDBRequest(method, url) {
 
 // Make the actual server request.
 
-//THIS IS NOT DONE!!!
 export function makeDbRequest() {
+		console.log("inside makeDBRequest");
     //need to retrieve source and target to create url
     let source = document.getElementById("word");
     let searchOutput = document.getElementById("outputGoesHere");
     let url = "store?english=" + source.textContent + "&spanish=" + searchOutput.textContent;
     let xhr = createDBRequest('GET', url);
-    
+	console.log("english content in make DbReq",source.textContent);
+	console.log("spanish content in make DbReq",searchOutput.textContent);
+	
     if (!xhr) {
         alert('Request not found');
         return;

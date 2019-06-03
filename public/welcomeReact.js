@@ -26,9 +26,13 @@ function Login() {
     return React.createElement(
         "div",
         {id: "login"},
-        React.createElement("button", {type: "login", value: "Log in with Google", id: "loginButton", /*, onClick(): "To Start Page"*/},
+				React.createElement("button", {type: "login", value: "Log in with Google", id: "loginButton", onClick: goToGoogle},
         React.createElement("img", {src: "./assets/google.jpg", id: "image"}), "Log in with Google")
     )
+}
+
+function goToGoogle() {
+	window.location.href="auth/google";
 }
 
 var main = React.createElement(

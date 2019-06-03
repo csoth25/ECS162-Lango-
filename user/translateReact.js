@@ -72,7 +72,7 @@ function checkSave() {
 	check = false;
 	makeDbRequest();
     } else {
-	alert('Woops, there was an error making the request.');
+	alert('checkSave -- Woops, there was an error making the request.');
     }
 }
 
