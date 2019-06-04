@@ -83,16 +83,31 @@ app.get('/auth/redirect',
 				// then it will run the "gotProfile" callback function,
 				// set up the cookie, call serialize, whose "done"
 				// will come back here to send back the response
-	// ...with a cookie in it for the Browser!
-	function (req, res) {
-	    console.log('Logged in and using cookies!');
-	    // if user has flashcards go to review, else go to translate	    
-	if (req.user) {
-          res.redirect('/user/translate.html');
-        } else {
-          res.redirect('/user/review.html');
-        }
-				});
+				// ...with a cookie in it for the Browser!
+				function (req, res) {
+				console.log('Logged in and using cookies!');
+				// if user has flashcards go to review, else go to translate
+				
+				
+				//search the Flashcards database for google ID match
+				//I think we still have to assign the userID as google ID in the Flashcards database for this
+				//to work properly. b
+				searchStr = 'SELECT googleID FROM Flashcards';
+				//console.log("search string in gotProfile: ", searchStr);
+				
+				db.get(searchStr, [], (err, row) => {
+							 if (err) {
+							 return console.error(err.message);
+							 }
+							 if (row) {
+							 // if row returns true, your user exists
+							 console.log("user has flashcards in Flashcards database, sent to review page");
+							 res.redirect('/user/review.html');
+							 } else {
+							 // if we enter here, user is not found
+							 console.log("user does not have any flashcards in Flashcards database, send to create page");
+							 res.redirect('/user/translate.html');
+							 });
 
 // static files in /user are only available after login
 app.get('/user/*',
@@ -123,8 +138,8 @@ function printURL (req, res, next) {
 // personal data
 function isAuthenticated(req, res, next) {
 	if (req.user) {
-	    console.log("Req.session:",req.session);
-	    console.log("Req.user:",req.user);
+		console.log("Req.session:",req.session);
+		console.log("Req.user:",req.user);
 		next();
 	} else {
 		res.redirect('/Welcome.html');  // send response telling
@@ -151,7 +166,7 @@ function gotProfile(accessToken, refreshToken, profile, done) {
 	let firstName = profile.name.givenName;
 	let lastName = profile.name.familyName;
 	let userData = {userData: {"id": dbRowID, "first": firstName, "last": lastName } };
-
+	
 	searchStr = 'SELECT googleID FROM UserInfo';
 	console.log("search string in gotProfile: ", searchStr);
 	
@@ -162,8 +177,8 @@ function gotProfile(accessToken, refreshToken, profile, done) {
 				 if (row) {
 				 // your user exists
 				 // You need to call done() here
-				     console.log("user exists");
-	//			     dumpDB();
+				 console.log("user exists");
+				 //			     dumpDB();
 				 done(null, userData);
 				 } else {
 				 // insert the user since you can't find it in the db
@@ -177,21 +192,17 @@ function gotProfile(accessToken, refreshToken, profile, done) {
 								done(null, userData);
 								})
 				 }
-				 });
-	/*db.run( searchStr, tableSearchCallback(dbRowID));
-	function tableSearchCallback(dbRowID){
-		//check if searchStr is empty
-		
-		
-		// Don't call done() here because db call is asynchronous, so you have no idea whether you have set finished fetching the user / inserting user data into the db or not. You userData or dbRowID might be null.
-	}*/
+				 });	 
+	 
+	 // Don't call done() here because db call is asynchronous, so you have no idea whether you have set finished fetching the user / inserting user data into the db or not. You userData or dbRowID might be null.
+	 }*/
 }
 
 // Part of Server's sesssion set-up.
 // The second operand of "done" becomes the input to deserializeUser
 // on every subsequent HTTP request with this session's cookie.
 passport.serializeUser((userData, done) => {
-//											 console.log("SerializeUser. Input is",userData);
+											 //											 console.log("SerializeUser. Input is",userData);
 											 done(null, userData);
 											 });
 
@@ -201,11 +212,11 @@ passport.serializeUser((userData, done) => {
 // Whatever we pass in the "done" callback becomes req.user
 // and can be used by subsequent middleware.
 passport.deserializeUser((userData, done) => {
-	//											 console.log("deserializeUser. Input is:", userData);
+												 //											 console.log("deserializeUser. Input is:", userData);
 												 // here is a good place to look up user data in database using
 												 // dbRowID. Put whatever you want into an object. It ends up
 												 // as the property "user" of the "req" object.
-
+												 
 												 //let userData = {userData: {"id": dbRowID} };
 												 //let userData = {userData: {"id": id, "first": firstName, "last": lastName } };
 												 done(null, userData);
@@ -230,201 +241,201 @@ const db = new sqlite3.Database(dbFileName);
 
 
 function queryHandler(req, res, next) {
-		console.log("inside query handler");
+	console.log("inside query handler");
 	console.log("req.url=", req.url);
-    let qObj = req.query;
-    
-    if (qObj.word != undefined) {
-
-    // An object containing the data expressing the query to the translate API.
-    // Below, gets stringified and put into the body of an HTTP PUT request.
-    let requestObject =
-        {
-        "source": "en",
-        "target": "es",
-        "q": [
-            " "
-        ]
-				};
-
-    requestObject.q[0] = qObj.word;
-    console.log("English phrase: ", requestObject.q[0]);
-
-    // The call that makes a request to the API
-    // Uses the Node request module, which packs up and sends off
-    // an HTTP message containing the request to the API server
-    APIrequest(
-        { // HTTP header stuff
-            url: url,
-            method: "POST",
-            headers: {"content-type": "application/json"},
-            // will turn the given object into JSON
-            json: requestObject	},
-          // callback function for API request
-          APIcallback
-        );
-      // callback function, called when data is received from API
-      function APIcallback(err, APIresHead, APIresBody) {
-        // gets three objects as input
-        if ((err) || (APIresHead.statusCode != 200)) {
-          // API is not working
-          console.log("Got API error");
-          console.log(APIresBody);
-        } else {
-          if (APIresHead.error) {
-            // API worked but is not giving you data
-            console.log(APIresHead.error);
-          } else {
-            var text = APIresBody.data.translations[0].translatedText;
-            console.log("In Spanish: ", text);
-            //output to the browser
-            res.json( {"word" : text} );
-            
-            console.log("\n\nJSON was:");
-            console.log(JSON.stringify(APIresBody, undefined, 2));
-            // print it out as a string, nicely formatted
-          }
-        }
-      } // end callback function
-    }
-    else {
-      next();
-    }
+	let qObj = req.query;
+	
+	if (qObj.word != undefined) {
+		
+		// An object containing the data expressing the query to the translate API.
+		// Below, gets stringified and put into the body of an HTTP PUT request.
+		let requestObject =
+		{
+			"source": "en",
+			"target": "es",
+			"q": [
+						" "
+						]
+		};
+		
+		requestObject.q[0] = qObj.word;
+		console.log("English phrase: ", requestObject.q[0]);
+		
+		// The call that makes a request to the API
+		// Uses the Node request module, which packs up and sends off
+		// an HTTP message containing the request to the API server
+		APIrequest(
+							 { // HTTP header stuff
+							 url: url,
+							 method: "POST",
+							 headers: {"content-type": "application/json"},
+							 // will turn the given object into JSON
+							 json: requestObject	},
+							 // callback function for API request
+							 APIcallback
+							 );
+		// callback function, called when data is received from API
+		function APIcallback(err, APIresHead, APIresBody) {
+			// gets three objects as input
+			if ((err) || (APIresHead.statusCode != 200)) {
+				// API is not working
+				console.log("Got API error");
+				console.log(APIresBody);
+			} else {
+				if (APIresHead.error) {
+					// API worked but is not giving you data
+					console.log(APIresHead.error);
+				} else {
+					var text = APIresBody.data.translations[0].translatedText;
+					console.log("In Spanish: ", text);
+					//output to the browser
+					res.json( {"word" : text} );
+					
+					console.log("\n\nJSON was:");
+					console.log(JSON.stringify(APIresBody, undefined, 2));
+					// print it out as a string, nicely formatted
+				}
+			}
+		} // end callback function
+	}
+	else {
+		next();
+	}
 }
 
 /*teach your app to answer translation queries, When it gets a URL in this format
-http://server162.site:port/translate?english=example phrase*/
+ http://server162.site:port/translate?english=example phrase*/
 function translateHandler(req, res, next) {
-    //let qObj = req.translate;
-		console.log("inside translate handler");
-    
-    const myurl = require('url');
-    const adr = req.url;
-		console.log("adr=", adr);
-    const q = myurl.parse(adr, true);
-    var qdata = q.query;
-    
-    if (qdata.english!= undefined){
-        //Return a HTTP response with an empty body, to let the browser know everything went well.
-        res.json( {} );
-        var source = qdata.english;
-        
-        // An object containing the data expressing the query to the translate API.
-        // Below, gets stringified and put into the body of an HTTP PUT request.
-        let requestObject =
-        {
-            "source": "en",
-            "target": "es",
-            "q": [
-                  " "
-                  ]
-				};
-        
-        requestObject.q[0] = source;
-        console.log("English phrase: ", requestObject.q[0]);
-        
-        // The call that makes a request to the API
-        // Uses the Node request module, which packs up and sends off
-        // an HTTP message containing the request to the API server
-        APIrequest(
-                   { // HTTP header stuff
-                   url: url,
-                   method: "POST",
-                   headers: {"content-type": "application/json"},
-                   // will turn the given object into JSON
-                   json: requestObject    },
-                   // callback function for API request
-                   APIcallback
-                   );
-        // callback function, called when data is received from API
-        function APIcallback(err, APIresHead, APIresBody) {
-            // gets three objects as input
-            if ((err) || (APIresHead.statusCode != 200)) {
-                // API is not working
-                console.log("Got API error");
-                console.log(APIresBody);
-            } else {
-                if (APIresHead.error) {
-                    // API worked but is not giving you data
-                    console.log(APIresHead.error);
-                } else {
-                    var text = APIresBody.data.translations[0].translatedText;
-                    console.log("In Spanish: ", text);
-                    
-                    console.log("\n\nJSON was:");
-                    console.log(JSON.stringify(APIresBody, undefined, 2));
-                    // print it out as a string, nicely formatted
-                }
-            }
-        } // end callback function
-    }
-    else {
-        next();
-    }
+	//let qObj = req.translate;
+	console.log("inside translate handler");
+	
+	const myurl = require('url');
+	const adr = req.url;
+	console.log("adr=", adr);
+	const q = myurl.parse(adr, true);
+	var qdata = q.query;
+	
+	if (qdata.english!= undefined){
+		//Return a HTTP response with an empty body, to let the browser know everything went well.
+		res.json( {} );
+		var source = qdata.english;
+		
+		// An object containing the data expressing the query to the translate API.
+		// Below, gets stringified and put into the body of an HTTP PUT request.
+		let requestObject =
+		{
+			"source": "en",
+			"target": "es",
+			"q": [
+						" "
+						]
+		};
+		
+		requestObject.q[0] = source;
+		console.log("English phrase: ", requestObject.q[0]);
+		
+		// The call that makes a request to the API
+		// Uses the Node request module, which packs up and sends off
+		// an HTTP message containing the request to the API server
+		APIrequest(
+							 { // HTTP header stuff
+							 url: url,
+							 method: "POST",
+							 headers: {"content-type": "application/json"},
+							 // will turn the given object into JSON
+							 json: requestObject    },
+							 // callback function for API request
+							 APIcallback
+							 );
+		// callback function, called when data is received from API
+		function APIcallback(err, APIresHead, APIresBody) {
+			// gets three objects as input
+			if ((err) || (APIresHead.statusCode != 200)) {
+				// API is not working
+				console.log("Got API error");
+				console.log(APIresBody);
+			} else {
+				if (APIresHead.error) {
+					// API worked but is not giving you data
+					console.log(APIresHead.error);
+				} else {
+					var text = APIresBody.data.translations[0].translatedText;
+					console.log("In Spanish: ", text);
+					
+					console.log("\n\nJSON was:");
+					console.log(JSON.stringify(APIresBody, undefined, 2));
+					// print it out as a string, nicely formatted
+				}
+			}
+		} // end callback function
+	}
+	else {
+		next();
+	}
 }
 
 /*Teach server to respond to AJAX queries of the form:
-http://server162.site:52547/store?english=hi&spanish=hola*/
+ http://server162.site:52547/store?english=hi&spanish=hola*/
 
 
 //right now, english does not have a value in the url - don't know why
 //every time save is clicked, the url has no value after english
 // /user/store?english=&spanish=madre%20est%C3%A1%20aqu%C3%AD
 function storeHandler(req, res, next){
-		console.log("inside save handler");
-    
-    //query URL
-    //source: https://www.w3schools.com/nodejs/nodejs_url.asp
-    const myurl = require('url');
-    const adr = req.url;
-		console.log("req.url = ", adr);
-    const q = myurl.parse(adr, true);
-    var qdata = q.query;
-		console.log("q.query = ", q.query);
-    
-    if (qdata.english != undefined && qdata.spanish != undefined){
-        //Return a HTTP response with an empty body, to let the browser know everything went well.
-        res.json( {} );
-        var source = qdata.english;
-        var target = qdata.spanish;
-	console.log("source value is", target);
-        
-        //currently code proceeds to store immediately
-        //next step: set up onclick in FlashcardsDB.js
-        //have the browser send the store request when the user hits the "Save" button.
-//	db.all('DELETE FROM Flashcards WHERE user = 1');
-        const cmdStr = 'INSERT into Flashcards (user, source, target, seen, correct ) VALUES (1, @0, @1, 0, 0)'
-        db.run(cmdStr, source, target, insertCallback);
-    }
+	console.log("inside save handler");
+	
+	//query URL
+	//source: https://www.w3schools.com/nodejs/nodejs_url.asp
+	const myurl = require('url');
+	const adr = req.url;
+	console.log("req.url = ", adr);
+	const q = myurl.parse(adr, true);
+	var qdata = q.query;
+	console.log("q.query = ", q.query);
+	
+	if (qdata.english != undefined && qdata.spanish != undefined){
+		//Return a HTTP response with an empty body, to let the browser know everything went well.
+		res.json( {} );
+		var source = qdata.english;
+		var target = qdata.spanish;
+		console.log("source value is", target);
+		
+		//currently code proceeds to store immediately
+		//next step: set up onclick in FlashcardsDB.js
+		//have the browser send the store request when the user hits the "Save" button.
+		//	db.all('DELETE FROM Flashcards WHERE user = 1');
+		const cmdStr = 'INSERT into Flashcards (user, source, target, seen, correct ) VALUES (1, @0, @1, 0, 0)'
+		db.run(cmdStr, source, target, insertCallback);
+	}
 }
 
 function insertCallback(err) {
-    if ("insertion error: ",err) {
-        console.log(err);
-    } else {
-        console.log("flashcard saved!");
-        
-        /*for debugging
-        get output from database
-        return all rows in data base with user 1*/
-       db.all(('SELECT * FROM Flashcards WHERE user = 1'), arrayCallback);
-			//print table 2 contents - user info
-			console.log("user table");
-	db.all(('SELECT * FROM UserInfo'), arrayCallback);
-    }
+	if ("insertion error: ",err) {
+		console.log(err);
+	} else {
+		console.log("flashcard saved!");
+		
+		/*for debugging
+		 get output from database
+		 return all rows in data base with user 1*/
+		db.all(('SELECT * FROM Flashcards WHERE user = 1'), arrayCallback);
+		//print table 2 contents - user info
+		console.log("user table");
+		db.all(('SELECT * FROM UserInfo'), arrayCallback);
+	}
 }
 
 
 //arrayData contains an array of objects, each object contains one row
 function arrayCallback(err, arrayData){
-    if(err) {
-        console.log("error: ", err, "\n");
-    } else {
-	console.log("array: ", arrayData, "\n");
-        dumpDB();
-        //use below to delete all data from DB when needed
-      //  db.all('DELETE FROM Flashcards WHERE user = 1');
-    }
+	if(err) {
+		console.log("error: ", err, "\n");
+	} else {
+		console.log("array: ", arrayData, "\n");
+		dumpDB();
+		//use below to delete all data from DB when needed
+		//  db.all('DELETE FROM Flashcards WHERE user = 1');
+	}
 }
 
 /*
@@ -436,17 +447,17 @@ function arrayCallback(err, arrayData){
 
 //To test program, print out the whole database
 function dumpDB() {
-    db.all ( 'SELECT * FROM Flashcards', dataCallback);
-    function dataCallback( err, data ) {console.log(data)}
+	db.all ( 'SELECT * FROM Flashcards', dataCallback);
+	function dataCallback( err, data ) {console.log(data)}
 }
 
 
 function fileNotFound(req, res) {
-    let url = req.url;
-    res.type('text/plain');
-    res.status(404);
-    res.send('Cannot find '+url);
-    }
+	let url = req.url;
+	res.type('text/plain');
+	res.status(404);
+	res.send('Cannot find '+url);
+}
 
 // put together the server pipeline
 //const app = express();
