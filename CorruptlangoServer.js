@@ -87,7 +87,11 @@ app.get('/auth/redirect',
 	function (req, res) {
 	    console.log('Logged in and using cookies!');
 	    // if user has flashcards go to review, else go to translate	    
-		res.redirect('/user/review.html');
+	if (req.user) {
+          res.redirect('/user/translate.html');
+        } else {
+          res.redirect('/user/review.html');
+        }
 				});
 
 // static files in /user are only available after login
