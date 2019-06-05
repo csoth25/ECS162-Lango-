@@ -15,7 +15,7 @@ export function makeDbRequest() {
     //need to retrieve source and target to create url
     let source = document.getElementById("word");
     let searchOutput = document.getElementById("outputGoesHere");
-    let url = "store?english=" + source.textContent + "&spanish=" + searchOutput.textContent;
+    let url = "store?english=" + source.value + "&spanish=" + searchOutput.textContent;
     let xhr = createDBRequest('GET', url);
 	console.log("english content in make DbReq",source.textContent);
 	console.log("spanish content in make DbReq",searchOutput.textContent);
