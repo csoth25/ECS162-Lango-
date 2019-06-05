@@ -1,6 +1,6 @@
 "strict mode"
 const express = require('express')
-const port = #####
+const port = 52547
 
 //phase 2
 const passport = require('passport');
@@ -86,20 +86,23 @@ app.get('/auth/redirect',
 	// ...with a cookie in it for the Browser!
 	function (req, res) {
 	    console.log('Logged in and using cookies!');
-	    // if user has flashcards go to review, else go to translate	    
-	    //search the Flashcards database for google ID match
-	    //I think we still have to assign the userID as google ID in the Flashcards database for this
-	    //to work properly. b
-	    searchStr = 'SELECT count(*) FROM Flashcards';
-	    //console.log("search string in gotProfile: ", searchStr);
-
-	    db.get(searchStr, [], (err, row) => {
+			//use this to clear both data base but remember to comment out later!
+			//db.all('DELETE FROM Flashcards');
+			//db.all('DELETE FROM UserInfo');
+				
+			//source: http://www.sqlitetutorial.net/sqlite-nodejs/query/
+			var googleID = req.user.userData.id;
+			searchStr = 'SELECT user FROM Flashcards WHERE user = ?';
+	    console.log("search string in gotProfile: ", searchStr);
+			
+	    db.get(searchStr, [googleID], (err, row) => {
+						 console.log("row", row);
 		if (err) {
 		    return console.error(err.message);
 		}
 		if (row) {
 		    // if row returns true, your user exists
-		    console.log("user has flashcards in Flashcards database, sent to review page");
+		    console.log("user has flashcards in Flashcards database, send to review page");
 		    res.redirect('/user/review.html');
 		} else {
 		    // if we enter here, user is not found
@@ -120,13 +123,6 @@ app.get('/user/*',
 // next, all queries (like translate or store or get...
 //app.get('/query', function (req, res) { res.send('HTTP query!') });
 
-// finally, not found...applies to everything
-//app.use( fileNotFound );
-
-// Pipeline is ready. Start listening!
-//app.listen(52547, function (){console.log('Listening...');} );
-
-// middleware functions
 
 // print the url of incoming HTTP request
 function printURL (req, res, next) {
@@ -167,45 +163,39 @@ function gotProfile(accessToken, refreshToken, profile, done) {
 	let lastName = profile.name.familyName;
 	let userData = {userData: {"id": dbRowID, "first": firstName, "last": lastName } };
 
-	searchStr = 'SELECT googleID FROM UserInfo';
+	searchStr = 'SELECT googleID FROM UserInfo where googleID = ?';
 	console.log("search string in gotProfile: ", searchStr);
 	
-	db.get(searchStr, [], (err, row) => {
+	db.get(searchStr, [dbRowID], (err, row) => {
+				 console.log("got profile row",row);
 				 if (err) {
 				 return console.error(err.message);
 				 }
 				 if (row) {
 				 // your user exists
-				 // You need to call done() here
-				 console.log("user exists");
+				 console.log("gotProfile: user exists");
 				 done(null, userData);
 				 } else {
 				 // insert the user since you can't find it in the db
-				 // You need to call done() here
 				 console.log("user does not exist, adding");
-				 db.run('INSERT INTO UserInfo(first, last, googleID) VALUES(?, ?, ?)', [firstName, lastName, dbRowID], (err) => {
+				 db.run('INSERT INTO UserInfo (first, last, googleID) VALUES(?, ?, ?)', [firstName, lastName, dbRowID], (err) => {
 								if(err) {
 								return console.log(err.message);
 								}
-								console.log('Row was added to the table: ${this.lastID}');
+								console.log('User was added to the table');
+								db.all(('SELECT * FROM UserInfo'), arrayUserCallback);
+								
 								done(null, userData);
 								})
 				 }
 				 });
-	/*db.run( searchStr, tableSearchCallback(dbRowID));
-	function tableSearchCallback(dbRowID){
-		//check if searchStr is empty
-		
-		
-		// Don't call done() here because db call is asynchronous, so you have no idea whether you have set finished fetching the user / inserting user data into the db or not. You userData or dbRowID might be null.
-	}*/
 }
 
 // Part of Server's sesssion set-up.
 // The second operand of "done" becomes the input to deserializeUser
 // on every subsequent HTTP request with this session's cookie.
 passport.serializeUser((userData, done) => {
-//											 console.log("SerializeUser. Input is",userData);
+//										console.log("SerializeUser. Input is",userData);
 											 done(null, userData);
 											 });
 
@@ -215,13 +205,7 @@ passport.serializeUser((userData, done) => {
 // Whatever we pass in the "done" callback becomes req.user
 // and can be used by subsequent middleware.
 passport.deserializeUser((userData, done) => {
-	 console.log("deserializeUser. Input is:", userData);
-									 // here is a good place to look up user data in database using
-									 // dbRowID. Put whatever you want into an object. It ends up
-									 // as the property "user" of the "req" object.
-
-									 //let userData = {userData: {"id": dbRowID} };
-									 //let userData = {userData: {"id": id, "first": firstName, "last": lastName } };
+	 //console.log("deserializeUser. Input is:", userData);
 									 done(null, userData);
 									 });
 
@@ -245,7 +229,6 @@ const db = new sqlite3.Database(dbFileName);
 
 function queryHandler(req, res, next) {
 		console.log("inside query handler");
-	console.log("req.url=", req.url);
     let qObj = req.query;
     
     if (qObj.word != undefined) {
@@ -309,9 +292,7 @@ function queryHandler(req, res, next) {
 /*teach your app to answer translation queries, When it gets a URL in this format
 http://server162.site:port/translate?english=example phrase*/
 function translateHandler(req, res, next) {
-    //let qObj = req.translate;
-		console.log("inside translate handler");
-    
+	
     const myurl = require('url');
     const adr = req.url;
 		console.log("adr=", adr);
@@ -380,12 +361,9 @@ function translateHandler(req, res, next) {
 /*Teach server to respond to AJAX queries of the form:
 http://server162.site:52547/store?english=hi&spanish=hola*/
 
-
-//right now, english does not have a value in the url - don't know why
-//every time save is clicked, the url has no value after english
-// /user/store?english=&spanish=madre%20est%C3%A1%20aqu%C3%AD
 function storeHandler(req, res, next){
 		console.log("inside save handler");
+	
     
     //query URL
     //source: https://www.w3schools.com/nodejs/nodejs_url.asp
@@ -399,17 +377,23 @@ function storeHandler(req, res, next){
     if (qdata.english != undefined && qdata.spanish != undefined){
         //Return a HTTP response with an empty body, to let the browser know everything went well.
         res.json( {} );
+				var user = req.user.userData.id;
         var source = qdata.english;
         var target = qdata.spanish;
-	console.log("source value is", target);
-        
-        //currently code proceeds to store immediately
-        //next step: set up onclick in FlashcardsDB.js
-        //have the browser send the store request when the user hits the "Save" button.
-	db.all('DELETE FROM Flashcards WHERE user = 1');
-        const cmdStr = 'INSERT into Flashcards (user, source, target, seen, correct ) VALUES (1, @0, @1, 0, 0)'
-        db.run(cmdStr, source, target, insertCallback);
+
+				const cmdStr = 'INSERT into Flashcards (user, source, target, seen, correct ) VALUES (?, ?, ?, 0, 0)';
+				db.run(cmdStr, user, source, target, insertCallback);
     }
+}
+
+function usernameHandler(req, res, next) {
+	
+	let qObj = req.username;
+	console.log(qObj);
+
+	var firstName = req.user.userData.firstName;
+	console.log("users first name is ", firstName);
+	//res.json( {"word" : qObj.word + text} );
 }
 
 function insertCallback(err) {
@@ -418,13 +402,12 @@ function insertCallback(err) {
     } else {
         console.log("flashcard saved!");
         
-        /*for debugging
-        get output from database
-        return all rows in data base with user 1*/
- //      db.all(('SELECT * FROM Flashcards WHERE user = 1'), arrayCallback);
-			//print table 2 contents - user info
-			console.log("user table");
-	db.all(('SELECT * FROM UserInfo'), arrayCallback);
+			//for debugging
+			/*console.log("insertCallback: flashcard table");
+      db.all(('SELECT * FROM Flashcards'), arrayCallback);
+
+			console.log("insertCallback: user table");
+			db.all(('SELECT * FROM UserInfo'), arrayUserCallback);*/
     }
 }
 
@@ -436,9 +419,22 @@ function arrayCallback(err, arrayData){
     } else {
 	console.log("array: ", arrayData, "\n");
         dumpDB();
+			
         //use below to delete all data from DB when needed
       //  db.all('DELETE FROM Flashcards WHERE user = 1');
     }
+}
+
+function arrayUserCallback(err, arrayData){
+	if(err) {
+		console.log("error: ", err, "\n");
+	} else {
+		console.log("array: ", arrayData, "\n");
+		dumpUserDB();
+		
+		//use below to delete all data from DB when needed
+		//  db.all('DELETE FROM Flashcards WHERE user = 1');
+	}
 }
 
 /*
@@ -454,6 +450,10 @@ function dumpDB() {
     function dataCallback( err, data ) {console.log(data)}
 }
 
+function dumpUserDB() {
+	db.all ( 'SELECT * FROM UserInfo', dataCallback);
+	function dataCallback( err, data ) {console.log(data)}
+}
 
 function fileNotFound(req, res) {
     let url = req.url;
@@ -466,6 +466,7 @@ function fileNotFound(req, res) {
 //const app = express();
 //app.use(express.static('public'));  // can I find a static file?
 app.get('/user/query', queryHandler);
+app.get('/user/username', usernameHandler)
 app.get('/user/translate', translateHandler);
 app.get('/user/store', storeHandler);
 app.use( fileNotFound );            // otherwise not found
