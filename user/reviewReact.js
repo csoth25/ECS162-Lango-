@@ -15,9 +15,13 @@ function add() {
 	"div",
 	{id: "review_div" },
 	React.createElement(
-	    "input", {type: "add", value: "Add", id: "add"},
+	    "input", {type: "add", value: "Add", id: "add", onClick: ToCreate},
 	)
     )
+}
+
+function ToCreate() {
+    window.location.href="/user/translate.html";
 }
 
 function Overall() {
