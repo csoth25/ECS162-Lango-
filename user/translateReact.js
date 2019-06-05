@@ -3,6 +3,8 @@
 //const fs = require("fs"); // file system
 import {makeServerRequest} from './translate.js';
 import {makeDbRequest} from './FlashcardsDB.js';
+import {makeUserNameRequest} from './footer.js';
+
 var check = false;
 
 function Title() {
@@ -80,10 +82,12 @@ function checkSave() {
     }
 }
 
-
+//need to make ajax query to makeUserNameRequest() 
 function footer() {
     return React.createElement(
-        "footer", {className: "foot"}, React.createElement("p", null, "UserName")
+				"footer", {className: "foot"}, React.createElement("placeholder", {id: "placeholder"}, "UserName")
+															 //React.createElement("p", null, "UserName")
+															 
     )
 }
 
@@ -99,4 +103,3 @@ var main = React.createElement(
 ReactDOM.render(
     main, document.getElementById('root')
 );
- 
