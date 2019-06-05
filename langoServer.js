@@ -83,11 +83,31 @@ app.get('/auth/redirect',
 				// then it will run the "gotProfile" callback function,
 				// set up the cookie, call serialize, whose "done"
 				// will come back here to send back the response
-				// ...with a cookie in it for the Browser!
-				function (req, res) {
-				console.log('Logged in and using cookies!')
-				res.redirect('/user/translate.html');
-				});
+	// ...with a cookie in it for the Browser!
+	function (req, res) {
+	    console.log('Logged in and using cookies!');
+	    // if user has flashcards go to review, else go to translate	    
+	    //search the Flashcards database for google ID match
+	    //I think we still have to assign the userID as google ID in the Flashcards database for this
+	    //to work properly. b
+	    searchStr = 'SELECT count(*) FROM Flashcards';
+	    //console.log("search string in gotProfile: ", searchStr);
+
+	    db.get(searchStr, [], (err, row) => {
+		if (err) {
+		    return console.error(err.message);
+		}
+		if (row) {
+		    // if row returns true, your user exists
+		    console.log("user has flashcards in Flashcards database, sent to review page");
+		    res.redirect('/user/review.html');
+		} else {
+		    // if we enter here, user is not found
+		    console.log("user does not have any flashcards in Flashcards database, send to create page");
+		    res.redirect('/user/translate.html');
+		}
+	    });
+	});
 
 // static files in /user are only available after login
 app.get('/user/*',
@@ -118,8 +138,8 @@ function printURL (req, res, next) {
 // personal data
 function isAuthenticated(req, res, next) {
 	if (req.user) {
-		console.log("Req.session:",req.session);
-		console.log("Req.user:",req.user);
+	    console.log("Req.session:",req.session);
+	    console.log("Req.user:",req.user);
 		next();
 	} else {
 		res.redirect('/Welcome.html');  // send response telling
@@ -185,7 +205,7 @@ function gotProfile(accessToken, refreshToken, profile, done) {
 // The second operand of "done" becomes the input to deserializeUser
 // on every subsequent HTTP request with this session's cookie.
 passport.serializeUser((userData, done) => {
-											 console.log("SerializeUser. Input is",userData);
+//											 console.log("SerializeUser. Input is",userData);
 											 done(null, userData);
 											 });
 
@@ -195,15 +215,15 @@ passport.serializeUser((userData, done) => {
 // Whatever we pass in the "done" callback becomes req.user
 // and can be used by subsequent middleware.
 passport.deserializeUser((userData, done) => {
-												 console.log("deserializeUser. Input is:", userData);
-												 // here is a good place to look up user data in database using
-												 // dbRowID. Put whatever you want into an object. It ends up
-												 // as the property "user" of the "req" object.
+	 console.log("deserializeUser. Input is:", userData);
+									 // here is a good place to look up user data in database using
+									 // dbRowID. Put whatever you want into an object. It ends up
+									 // as the property "user" of the "req" object.
 
-												 //let userData = {userData: {"id": dbRowID} };
-												 //let userData = {userData: {"id": id, "first": firstName, "last": lastName } };
-												 done(null, userData);
-												 });
+									 //let userData = {userData: {"id": dbRowID} };
+									 //let userData = {userData: {"id": id, "first": firstName, "last": lastName } };
+									 done(null, userData);
+									 });
 
 //phase 2
 
@@ -376,20 +396,19 @@ function storeHandler(req, res, next){
     var qdata = q.query;
 		console.log("q.query = ", q.query);
     
-    if (qdata.english!= undefined && qdata.spanish != undefined){
+    if (qdata.english != undefined && qdata.spanish != undefined){
         //Return a HTTP response with an empty body, to let the browser know everything went well.
         res.json( {} );
         var source = qdata.english;
         var target = qdata.spanish;
-				console.log("source value is", source);
-        
+	console.log("source value is", target);
         
         //currently code proceeds to store immediately
         //next step: set up onclick in FlashcardsDB.js
         //have the browser send the store request when the user hits the "Save" button.
-
-        //const cmdStr = 'INSERT into Flashcards (user, source, target, seen, correct ) VALUES (1, @0, @1, 0, 0)'
-        //db.run(cmdStr, source, target, insertCallback);
+	db.all('DELETE FROM Flashcards WHERE user = 1');
+        const cmdStr = 'INSERT into Flashcards (user, source, target, seen, correct ) VALUES (1, @0, @1, 0, 0)'
+        db.run(cmdStr, source, target, insertCallback);
     }
 }
 
@@ -402,10 +421,10 @@ function insertCallback(err) {
         /*for debugging
         get output from database
         return all rows in data base with user 1*/
-        db.all(('SELECT * FROM Flashcards WHERE user = 1'), arrayCallback);
+ //      db.all(('SELECT * FROM Flashcards WHERE user = 1'), arrayCallback);
 			//print table 2 contents - user info
 			console.log("user table");
-				db.all(('SELECT * FROM UserInfo'), arrayCallback);
+	db.all(('SELECT * FROM UserInfo'), arrayCallback);
     }
 }
 
@@ -415,10 +434,10 @@ function arrayCallback(err, arrayData){
     if(err) {
         console.log("error: ", err, "\n");
     } else {
-        console.log("array: ", arrayData, "\n");
-        //dumpDB();
+	console.log("array: ", arrayData, "\n");
+        dumpDB();
         //use below to delete all data from DB when needed
-        //db.all('DELETE FROM Flashcards WHERE user = 1');
+      //  db.all('DELETE FROM Flashcards WHERE user = 1');
     }
 }
 
@@ -428,12 +447,12 @@ function arrayCallback(err, arrayData){
  */
 
 
-/*
+
 //To test program, print out the whole database
-dumpDB() {
+function dumpDB() {
     db.all ( 'SELECT * FROM Flashcards', dataCallback);
     function dataCallback( err, data ) {console.log(data)}
-}*/
+}
 
 
 function fileNotFound(req, res) {
