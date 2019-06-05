@@ -20,9 +20,13 @@ function startReview() {
 	"div",
 	{id: "review_div" },
 	React.createElement(
-	    "input", {type: "review", value: "Start Review", id: "review"},
+	    "input", {type: "review", value: "Start Review", id: "review", onClick: ToReview},
 	)
     )
+}
+
+function ToReview() {
+    window.location.href="/user/review.html";
 }
 
 function Overall() {
