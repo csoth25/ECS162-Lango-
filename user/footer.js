@@ -12,7 +12,7 @@ function createServerRequest(method, url) {
 export function makeUserNameRequest() {
 	console.log("inside makeUserNameRequest");
 	
-	let url = "/user/username?";
+	let url = "username?";
 	let xhr = createServerRequest('GET', url);
 	
 	if (!xhr) {
@@ -26,7 +26,7 @@ export function makeUserNameRequest() {
 		let object = JSON.parse(responseStr);  // turn it into an object
 		
 		let test = document.getElementById("placeholder");
-		test.textContent = object.word;
+		test.textContent = object.username;
 	}
 	
 	xhr.onerror = function() {
