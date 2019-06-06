@@ -37,3 +37,82 @@ export function makeUserNameRequest() {
 	xhr.send();
 }
 
+export function makeTargetRequest() {
+    let url = "target?";
+    let xhr = createServerRequest('GET', url);
+
+    if (!xhr) {
+	alert('Request not found');
+	return;
+    }
+
+    // Load some functions into response handlers.
+    xhr.onload = function() {
+	let responseStr = xhr.responseText;  // get the JSON string
+	let object = JSON.parse(responseStr);  // turn it into an object
+
+	let test = document.getElementById("word");
+	test.textContent = object.target;
+    }
+
+    xhr.onerror = function() {
+	alert('Woops, there was an error making the request.');
+    };
+
+    // Actually send request to server
+    xhr.send();
+}
+
+export function makeNextRequest() {
+    let url = "next?";
+    let xhr = createServerRequest('GET', url);
+
+    if (!xhr) {
+	alert('Request not found');
+	return;
+    }
+
+    // Load some functions into response handlers.
+    xhr.onload = function() {
+	let responseStr = xhr.responseText;  // get the JSON string
+	let object = JSON.parse(responseStr);  // turn it into an object
+
+	let test = document.getElementById("word");
+	test.textContent = object.next;
+    }
+
+    xhr.onerror = function() {
+	alert('Woops, there was an error making the request.');
+    };
+
+    // Actually send request to server
+    xhr.send();
+}
+
+export function makeAnswerRequest() {
+    let searchOutput = document.getElementById("outputGoesHere");
+    let url = "answer?test=" + searchOutput.value;
+    let xhr = createServerRequest('GET', url);
+
+    if (!xhr) {
+	alert('Request not found');
+	return;
+    }
+
+    // Load some functions into response handlers.
+    xhr.onload = function() {
+	let responseStr = xhr.responseText;  // get the JSON string
+	let object = JSON.parse(responseStr);  // turn it into an object
+
+	let test = document.getElementById("word");
+	test.textContent = object.target;
+// makeTargetRequest();
+    }
+
+    xhr.onerror = function() {
+	alert('Woops, there was an error making the request.');
+    };
+
+    // Actually send request to server
+    xhr.send();
+}
