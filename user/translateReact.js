@@ -81,14 +81,21 @@ function checkSave() {
     }
 }
 
+class userInfo {
+	constructor() {
+	};
+	getUsername() {
+		makeUserNameRequest();
+	}
+};
+
+const user = new userInfo();
+user.getUsername();
+
 function footer() {
     return React.createElement(
-			"footer", {className: "foot"}, React.createElement("p", {id: "placeholder", onClick: getUsername}, "UserName")															 
+			"footer", {className: "foot"}, React.createElement("p", {id: "placeholder"}, "UserName")
     )
-}
-
-function getUsername() {
-	makeUserNameRequest();
 }
 
 var main = React.createElement(
