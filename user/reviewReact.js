@@ -1,7 +1,6 @@
 'use strict'
 
-//this import is not working - can't make call to makeUserNameRequest() in footer
-//import {makeUserNameRequest} from './footer.js';
+import {makeUserNameRequest} from './footer.js';
 
 function Title() {
     return React.createElement(
@@ -62,17 +61,22 @@ function Next() {
 	)
 }
 
+class userInfo {
+	constructor() {
+	};
+	getUsername() {
+		makeUserNameRequest();
+	}
+};
+
+const user = new userInfo();
+user.getUsername();
+
 function footer() {
 	return React.createElement(
-		"footer", {className: "foot"}, React.createElement("p", {id: "placeholder", onClick: getUsername}, "UserName")
+														 "footer", {className: "foot"}, React.createElement("p", {id: "placeholder"}, "UserName")
 														 )
 }
-
-function getUsername() {
-	//makeUserNameRequest();
-	console.log("inside getUsername");
-}
-
 
 var main = React.createElement(
 	"main",
