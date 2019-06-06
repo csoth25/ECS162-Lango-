@@ -1,6 +1,8 @@
 'use strict'
 
-import {makeUserNameRequest} from './footer.js';
+//this import is not working - can't make call to makeUserNameRequest() in footer
+import {makeUserNameRequest, makeAnswerRequest} from './footer.js';
+import {makeTargetRequest, makeNextRequest} from './footer.js';
 
 function Title() {
     return React.createElement(
@@ -33,22 +35,38 @@ function Overall() {
     )
 }
 
+class Target {
+    getTarget() {
+	makeTargetRequest();
+    }
+};
+
+const aim = new Target();
+aim.getTarget();
+
 function Question() {
     return React.createElement(
 	"div",
 	{ id: "inputDiv" },
 	React.createElement(
-       "p", {id: "word"}), React.createElement("img", {src: "./assets/noun_Refresh_2310283.svg", id: "image"}),//onclick: "Flip to correct"
+	    "p", {id: "word"}), React.createElement("img", {src: "./assets/noun_Refresh_2310283.svg", id: "image"}),//onclick: "Flip to correct"
     );
 }
+
 
 function Answer() {
 	return React.createElement(
 		"div",
 		{ id: "outputDiv" },
             React.createElement(
-		"input", {id: "outputGoesHere"})
+		"input", {id: "outputGoesHere", onKeyPress: CheckAns})
 	);
+}
+
+function CheckAns(event) {
+	if (event.charCode == 13) {
+	    makeAnswerRequest();
+	}
 }
 
 function Next() {
@@ -56,17 +74,19 @@ function Next() {
 		"div",
 		{ id: "nextDiv" },
         React.createElement(
-            "input", {type: "next", value: "Next", id: "next"}
+            "input", {type: "next", value: "Next", id: "next", onClick: Check}
         )
 	)
 }
 
+function Check() {
+    makeNextRequest();
+}
+
 class userInfo {
-	constructor() {
-	};
-	getUsername() {
-		makeUserNameRequest();
-	}
+    getUsername() {
+	makeUserNameRequest();
+    }
 };
 
 const user = new userInfo();
@@ -74,9 +94,12 @@ user.getUsername();
 
 function footer() {
 	return React.createElement(
-														 "footer", {className: "foot"}, React.createElement("p", {id: "placeholder"}, "UserName")
+	    "footer", {className: "foot"}, React.createElement("p", {id: "placeholder"}, "UserName")
 														 )
 }
+
+
+
 
 var main = React.createElement(
 	"main",
