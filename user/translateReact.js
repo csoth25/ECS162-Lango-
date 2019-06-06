@@ -1,6 +1,5 @@
 'use strict'
-//const sqlite3 = require("sqlite3").verbose();  // use sqlite
-//const fs = require("fs"); // file system
+
 import {makeServerRequest} from './translate.js';
 import {makeDbRequest} from './FlashcardsDB.js';
 import {makeUserNameRequest} from './footer.js';
@@ -82,13 +81,14 @@ function checkSave() {
     }
 }
 
-//need to make ajax query to makeUserNameRequest() 
 function footer() {
     return React.createElement(
-				"footer", {className: "foot"}, React.createElement("placeholder", {id: "placeholder"}, "UserName")
-															 //React.createElement("p", null, "UserName")
-															 
+			"footer", {className: "foot"}, React.createElement("p", {id: "placeholder", onClick: getUsername}, "UserName")															 
     )
+}
+
+function getUsername() {
+	makeUserNameRequest();
 }
 
 var main = React.createElement(
