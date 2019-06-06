@@ -1,6 +1,6 @@
 "strict mode"
 const express = require('express')
-const port = 52547
+const port = 58408
 
 //phase 2
 const passport = require('passport');
@@ -136,7 +136,7 @@ function isAuthenticated(req, res, next) {
 	if (req.user) {
 	    console.log("Req.session:",req.session);
 	    console.log("Req.user:",req.user);
-		next();
+	    next();
 	} else {
 		res.redirect('/Welcome.html');  // send response telling
 		// Browser to go to login page
@@ -182,8 +182,8 @@ function gotProfile(accessToken, refreshToken, profile, done) {
 								if(err) {
 								return console.log(err.message);
 								}
-								console.log('User was added to the table');
-								db.all(('SELECT * FROM UserInfo'), arrayUserCallback);
+//								console.log('User was added to the table');
+//								db.all(('SELECT * FROM UserInfo'), arrayUserCallback);
 								
 								done(null, userData);
 								})
@@ -360,7 +360,6 @@ function translateHandler(req, res, next) {
 
 /*Teach server to respond to AJAX queries of the form:
 http://server162.site:52547/store?english=hi&spanish=hola*/
-
 function storeHandler(req, res, next){
 		console.log("inside save handler");
 	
@@ -377,7 +376,7 @@ function storeHandler(req, res, next){
     if (qdata.english != undefined && qdata.spanish != undefined){
         //Return a HTTP response with an empty body, to let the browser know everything went well.
         res.json( {} );
-				var user = req.user.userData.id;
+	var user = req.user.userData.id;
         var source = qdata.english;
         var target = qdata.spanish;
 
@@ -395,18 +394,64 @@ function usernameHandler(req, res, next) {
 	res.json( {"username" : firstName} );
 }
 
+function targetHandler(req, res) {
+    db.all(('SELECT * FROM Flashcards'), [], (err, row) => {
+	if (err) {
+	    throw err;
+	}
+	    var test = row[0].target;
+	    res.json( {"target" : test});
+    });
+}
+
+var count = 0;
+function NextHandler(req, res) {
+    count = count + 1;
+    db.all(('SELECT * FROM Flashcards'), [], (err, row) => {
+	if (err) {
+	    throw err;
+	}
+	if (count < row.length) {
+	    var test2 = row[count].target;
+	    res.json( {"next" : test2});
+	} else {
+	    res.json({"next": "No more"});
+	}
+    });
+}
+
+function AnswerHandler(req, res) {
+    const myurl = require('url');
+    const adr = req.url;
+    const q = myurl.parse(adr, true);
+    var qdata = q.query;
+    console.log(qdata.test);
+    var ans = qdata.test;
+    db.all(('SELECT source FROM Flashcards'), [], (err, row) => {
+	if (err) {
+	    throw err;
+	}
+	console.log(row[count].source);
+	if (ans == row[count].source) {
+	    res.json( {"target" : "Correct!"});
+	} else {
+	    res.json({"target": row[count].source});
+	}
+    });
+}
+
 function insertCallback(err) {
     if ("insertion error: ",err) {
         console.log(err);
     } else {
         console.log("flashcard saved!");
         
-			//for debugging
-			/*console.log("insertCallback: flashcard table");
-      db.all(('SELECT * FROM Flashcards'), arrayCallback);
-
-			console.log("insertCallback: user table");
-			db.all(('SELECT * FROM UserInfo'), arrayUserCallback);*/
+	//for debugging
+	console.log("insertCallback: user table");
+	db.all(('SELECT * FROM UserInfo'), arrayUserCallback);
+	
+	console.log("insertCallback: flashcard table");
+	db.all(('SELECT * FROM Flashcards'), arrayCallback);
     }
 }
 
@@ -416,8 +461,10 @@ function arrayCallback(err, arrayData){
     if(err) {
         console.log("error: ", err, "\n");
     } else {
-	console.log("array: ", arrayData, "\n");
-        dumpDB();
+	console.log("arraydb: ", arrayData, "\n");
+	return arrayData;
+//	console.log(arrayData[0].target, "\n");
+	//      dumpDB();
 			
         //use below to delete all data from DB when needed
       //  db.all('DELETE FROM Flashcards WHERE user = 1');
@@ -428,8 +475,8 @@ function arrayUserCallback(err, arrayData){
 	if(err) {
 		console.log("error: ", err, "\n");
 	} else {
-		console.log("array: ", arrayData, "\n");
-		dumpUserDB();
+		console.log("arrayuser: ", arrayData, "\n");
+	    //		dumpUserDB();
 		
 		//use below to delete all data from DB when needed
 		//  db.all('DELETE FROM Flashcards WHERE user = 1');
@@ -440,8 +487,6 @@ function arrayUserCallback(err, arrayData){
  //to update a row, do NOT omit WHERE, risk changing all columns in all rows
  db.run('UPDATE Flashcards SET seen = 1 WHERE rowid = 1'), errorCallback);
  */
-
-
 
 //To test program, print out the whole database
 function dumpDB() {
@@ -466,6 +511,9 @@ function fileNotFound(req, res) {
 //app.use(express.static('public'));  // can I find a static file?
 app.get('/user/query', queryHandler);
 app.get('/user/username', usernameHandler);
+app.get('/user/target', targetHandler);
+app.get('/user/next', NextHandler);
+app.get('/user/answer', AnswerHandler);
 app.get('/user/translate', translateHandler);
 app.get('/user/store', storeHandler);
 app.use( fileNotFound );            // otherwise not found
