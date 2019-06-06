@@ -298,21 +298,21 @@ var Card = function (_React$Component5) {
 	
 	// Actual card
 	_createClass(Card, [{
-											key: 'render',
-											value: function render() {
-											return React.createElement(
-																								 'div',
-																								 { className: 'card-container' },
-																								 React.createElement(
-																																		 'div',
-																																		 { className: 'card-body' },
-																																		 React.createElement(CardBack, { text: 'CORRECT!', id: "test" }),
-																																		 React.createElement(CardFront, { text: 'Phrase' }),
-																																		 //   React.createElement(CardBack, { text: 'Test' })
-																																		 )
-																								 );
-											}
-											}]);
+			key: 'render',
+			value: function render() {
+			return React.createElement(
+			 'div',
+			{ className: 'card-container' },
+			React.createElement(
+			 'div',
+			 { className: 'card-body' },
+			 React.createElement(CardBack, { text: 'CORRECT!', id: "test" }),
+			 React.createElement(CardFront, { text: 'Phrase' }),
+			 //   React.createElement(CardBack, { text: 'Test' })
+			 )
+			 );
+				}
+	}]);
 	
 	
 	return Card;
