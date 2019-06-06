@@ -387,13 +387,12 @@ function storeHandler(req, res, next){
 }
 
 function usernameHandler(req, res, next) {
+	console.log("inside usernameHandler");
 	
-	let qObj = req.username;
-	console.log(qObj);
+	var firstName = req.user.userData.first;
 
-	var firstName = req.user.userData.firstName;
-	console.log("users first name is ", firstName);
-	//res.json( {"word" : qObj.word + text} );
+	console.log("users first name is", firstName);
+	res.json( {"username" : firstName} );
 }
 
 function insertCallback(err) {
@@ -466,7 +465,7 @@ function fileNotFound(req, res) {
 //const app = express();
 //app.use(express.static('public'));  // can I find a static file?
 app.get('/user/query', queryHandler);
-app.get('/user/username', usernameHandler)
+app.get('/user/username', usernameHandler);
 app.get('/user/translate', translateHandler);
 app.get('/user/store', storeHandler);
 app.use( fileNotFound );            // otherwise not found
