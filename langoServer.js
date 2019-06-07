@@ -1,7 +1,7 @@
 "strict mode"
 const express = require('express')
 const port = 58408
-
+var count = 0;
 //phase 2
 const passport = require('passport');
 const cookieSession = require('cookie-session');
@@ -94,7 +94,7 @@ app.get('/auth/redirect',
 			var googleID = req.user.userData.id;
 			searchStr = 'SELECT user FROM Flashcards WHERE user = ?';
 	    console.log("search string in gotProfile: ", searchStr);
-			
+	    count = 0;
 	    db.get(searchStr, [googleID], (err, row) => {
 						 console.log("row", row);
 		if (err) {
@@ -379,9 +379,10 @@ function storeHandler(req, res, next){
 	var user = req.user.userData.id;
         var source = qdata.english;
         var target = qdata.spanish;
-
-				const cmdStr = 'INSERT into Flashcards (user, source, target, seen, correct ) VALUES (?, ?, ?, 0, 0)';
-				db.run(cmdStr, user, source, target, insertCallback);
+	var seen = 0;
+	var correct = 0;
+	const cmdStr = 'INSERT into Flashcards (user, source, target, seen, correct ) VALUES (?, ?, ?, ?, ?)';
+	db.run(cmdStr, user, source, target, seen, correct, insertCallback);
     }
 }
 
@@ -395,27 +396,67 @@ function usernameHandler(req, res, next) {
 }
 
 function targetHandler(req, res) {
-    db.all(('SELECT * FROM Flashcards'), [], (err, row) => {
+    var googleID = req.user.userData.id;
+    var cmdStr = 'SELECT * FROM Flashcards WHERE user = ?';
+    console.log("search string is ", cmdStr);
+    db.all(cmdStr, [googleID], (err, row) => {
 	if (err) {
 	    throw err;
 	}
-	    var test = row[0].target;
-	    res.json( {"target" : test});
+	var test = row[0].target;
+	row[0].seen = row[0].seen + 1;
+	//console.log("no of times card is seen: ", row[0].seen);
+	res.json( {"target" : test});
+	//dumpDB();
     });
 }
 
-var count = 0;
+function sourceHandler(req, res) {
+    var googleID = req.user.userData.id;
+    var cmdStr = 'SELECT * FROM Flashcards WHERE user = ?';
+    console.log("search string is ", cmdStr);
+    db.all(cmdStr, [googleID], (err, row) => {
+	if (err) {
+	    throw err;
+	}
+	var test = row[0].source;
+	res.json( {"source" : test});
+    });
+}
+
+
+var score = 0;
 function NextHandler(req, res) {
     count = count + 1;
-    db.all(('SELECT * FROM Flashcards'), [], (err, row) => {
+    var googleID = req.user.userData.id;
+    var cmdStr = 'SELECT * FROM Flashcards WHERE user = ?';
+    db.all(cmdStr, [googleID], (err, row) => {
 	if (err) {
 	    throw err;
 	}
 	if (count < row.length) {
 	    var test2 = row[count].target;
+	    row[count].seen = row[count].seen + 1;
 	    res.json( {"next" : test2});
 	} else {
-	    res.json({"next": "No more"});
+	    var final = "Your score is " + score + "/" + row.length;
+	    res.json({"next": final});
+	}
+    });
+}
+
+function NextSourceHandler(req, res) {
+    var googleID = req.user.userData.id;
+    var cmdStr = 'SELECT * FROM Flashcards WHERE user = ?';
+    db.all(cmdStr, [googleID], (err, row) => {
+	if (err) {
+	    throw err;
+	}
+	if (count < row.length) {
+	    var test2 = row[count].source;
+	    res.json( {"nextS" : test2});
+	} else {
+	    res.json({"nextS": "No more"});
 	}
     });
 }
@@ -425,14 +466,16 @@ function AnswerHandler(req, res) {
     const adr = req.url;
     const q = myurl.parse(adr, true);
     var qdata = q.query;
-    console.log(qdata.test);
     var ans = qdata.test;
-    db.all(('SELECT source FROM Flashcards'), [], (err, row) => {
+    var googleID = req.user.userData.id;
+    var cmdStr = 'SELECT * FROM Flashcards WHERE user = ?';
+    db.all(cmdStr, [googleID], (err, row) => {
 	if (err) {
 	    throw err;
 	}
-	console.log(row[count].source);
 	if (ans == row[count].source) {
+	    row[count].correct = row[count].correct + 1;
+	    score = score + 1;
 	    res.json( {"target" : "Correct!"});
 	} else {
 	    res.json({"target": row[count].source});
@@ -462,10 +505,7 @@ function arrayCallback(err, arrayData){
         console.log("error: ", err, "\n");
     } else {
 	console.log("arraydb: ", arrayData, "\n");
-	return arrayData;
-//	console.log(arrayData[0].target, "\n");
-	//      dumpDB();
-			
+//	dumpDB();		
         //use below to delete all data from DB when needed
       //  db.all('DELETE FROM Flashcards WHERE user = 1');
     }
@@ -512,7 +552,9 @@ function fileNotFound(req, res) {
 app.get('/user/query', queryHandler);
 app.get('/user/username', usernameHandler);
 app.get('/user/target', targetHandler);
+app.get('/user/source', sourceHandler);
 app.get('/user/next', NextHandler);
+app.get('/user/nextS', NextSourceHandler);
 app.get('/user/answer', AnswerHandler);
 app.get('/user/translate', translateHandler);
 app.get('/user/store', storeHandler);
