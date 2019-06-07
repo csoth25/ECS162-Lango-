@@ -1,5 +1,13 @@
 "strict mode";
 
+export function flip() {
+    document.getElementById("outputGoesHere").onKeyPress = function(event) {
+	if (event.charCode == 13) {
+	    document.getElementById("flip-card").classList.toggle("do-flip");
+	}
+    }
+}
+
 // Create the XHR object.
 function createServerRequest(method, url) {
 	let xhr = new XMLHttpRequest();
@@ -63,6 +71,33 @@ export function makeTargetRequest() {
     xhr.send();
 }
 
+export function makeSourceRequest() {
+    let url = "source?";
+    let xhr = createServerRequest('GET', url);
+
+    if (!xhr) {
+	alert('Request not found');
+	return;
+    }
+
+    // Load some functions into response handlers.
+    xhr.onload = function() {
+	let responseStr = xhr.responseText;  // get the JSON string
+	let object = JSON.parse(responseStr);  // turn it into an object
+
+	let test = document.getElementById("ans");
+	test.textContent = object.source;
+    }
+
+    xhr.onerror = function() {
+	alert('Woops, there was an error making the request.');
+    };
+
+    // Actually send request to server
+    xhr.send();
+}
+
+
 export function makeNextRequest() {
     let url = "next?";
     let xhr = createServerRequest('GET', url);
@@ -89,6 +124,32 @@ export function makeNextRequest() {
     xhr.send();
 }
 
+export function makeNextSourceRequest() {
+    let url = "nextS?";
+    let xhr = createServerRequest('GET', url);
+
+    if (!xhr) {
+	alert('Request not found');
+	return;
+    }
+
+    // Load some functions into response handlers.
+    xhr.onload = function() {
+	let responseStr = xhr.responseText;  // get the JSON string
+	let object = JSON.parse(responseStr);  // turn it into an object
+
+	let test = document.getElementById("ans");
+	test.textContent = object.nextS;
+    }
+
+    xhr.onerror = function() {
+	alert('Woops, there was an error making the request.');
+    };
+
+    // Actually send request to server
+    xhr.send();
+}
+
 export function makeAnswerRequest() {
     let searchOutput = document.getElementById("outputGoesHere");
     let url = "answer?test=" + searchOutput.value;
@@ -103,10 +164,8 @@ export function makeAnswerRequest() {
     xhr.onload = function() {
 	let responseStr = xhr.responseText;  // get the JSON string
 	let object = JSON.parse(responseStr);  // turn it into an object
-
-	let test = document.getElementById("word");
-	test.textContent = object.target;
-// makeTargetRequest();
+	let dis = document.getElementById("word");
+	dis.textContent = object.target;
     }
 
     xhr.onerror = function() {
