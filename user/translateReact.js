@@ -1,8 +1,9 @@
 'use strict'
-//const sqlite3 = require("sqlite3").verbose();  // use sqlite
-//const fs = require("fs"); // file system
+
 import {makeServerRequest} from './translate.js';
 import {makeDbRequest} from './FlashcardsDB.js';
+import {makeUserNameRequest} from './footer.js';
+
 var check = false;
 
 function Title() {
@@ -20,9 +21,13 @@ function startReview() {
 	"div",
 	{id: "review_div" },
 	React.createElement(
-	    "input", {type: "review", value: "Start Review", id: "review"},
+	    "input", {type: "review", value: "Start Review", id: "review", onClick: ToReview},
 	)
     )
+}
+
+function ToReview() {
+    window.location.href="/user/review.html";
 }
 
 function Overall() {
@@ -72,14 +77,24 @@ function checkSave() {
 	check = false;
 	makeDbRequest();
     } else {
-	alert('Woops, there was an error making the request.');
+	alert('checkSave -- Woops, there was an error making the request.');
     }
 }
 
+class userInfo {
+	constructor() {
+	};
+	getUsername() {
+		makeUserNameRequest();
+	}
+};
+
+const user = new userInfo();
+user.getUsername();
 
 function footer() {
     return React.createElement(
-        "footer", {className: "foot"}, React.createElement("p", null, "UserName")
+			"footer", {className: "foot"}, React.createElement("p", {id: "placeholder"}, "UserName")
     )
 }
 
@@ -95,4 +110,3 @@ var main = React.createElement(
 ReactDOM.render(
     main, document.getElementById('root')
 );
- 

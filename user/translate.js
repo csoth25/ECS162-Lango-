@@ -13,6 +13,7 @@ export function makeServerRequest() {
   let searchInput = document.getElementById("word");
   let input = searchInput.value;
   let url = "query?word=" + input;
+	//let url = "translate?english=" + input;
   let xhr = createServerRequest('GET', url);
 
   if (!xhr) {
